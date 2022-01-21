@@ -22,9 +22,7 @@ async fn cam_stream() -> Result<MediaStream, JsValue> {
 pub fn VideoTag(cx: Scope) -> Element {
     let vtag = use_ref(&cx, || None);
     let isRecordingOver = use_state(&cx, || false);
-    /* let mystream = use_state(&cx, || async {
-        cam_stream().await.unwrap();
-    }); */
+
     console::log!(*isRecordingOver);
     // when the element is mounted, bind the video element to the scope
     let fut = use_future(&cx, move || {
