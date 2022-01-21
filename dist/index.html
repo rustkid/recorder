@@ -1,0 +1,41 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/global-9d9b33a72ef2fe62.css">
+    <title>PixelPeg</title>
+
+<link rel="preload" href="/index-616fe2cadd0ebab8_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
+<link rel="modulepreload" href="/index-616fe2cadd0ebab8.js"></head>
+
+<body>
+    <div id="main" style="gap:0; height:100%;"> </div>
+
+
+<script type="module">import init from '/index-616fe2cadd0ebab8.js';init('/index-616fe2cadd0ebab8_bg.wasm');</script><script>(function () {
+    var url = 'ws://' + window.location.host + '/_trunk/ws';
+    var poll_interval = 5000;
+    var reload_upon_connect = () => {
+        window.setTimeout(
+            () => {
+                // when we successfully reconnect, we'll force a
+                // reload (since we presumably lost connection to
+                // trunk due to it being killed, so it will have
+                // rebuilt on restart)
+                var ws = new WebSocket(url);
+                ws.onopen = () => window.location.reload();
+                ws.onclose = reload_upon_connect;
+            },
+            poll_interval);
+    };
+
+    var ws = new WebSocket(url);
+    ws.onmessage = (ev) => {
+        const msg = JSON.parse(ev.data);
+        if (msg.reload) {
+            window.location.reload();
+        }
+    };
+    ws.onclose = reload_upon_connect;
+})()
+</script></body></html>

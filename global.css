@@ -1,0 +1,247 @@
+/*
+  1. Use a more-intuitive box-sizing model.
+*/
+*, *::before, *::after {
+    box-sizing: border-box;
+  }
+  /*
+    2. Remove default margin
+  */
+  * {
+    margin: 0;
+  }
+  /*
+    3. Allow percentage-based heights in the application
+  */
+  html, body {
+    height: 100%;
+  }
+  /*
+    Typographic tweaks!
+    4. Add accessible line-height
+    5. Improve text rendering
+  */
+  body {
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  /*
+    6. Improve media defaults
+  */
+  img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+  }
+  /*
+    7. Remove built-in form typography styles
+  */
+  input, button, textarea, select {
+    font: inherit;
+  }
+  /*
+    8. Avoid text overflows
+  */
+  p, h1, h2, h3, h4, h5, h6 {
+    overflow-wrap: break-word;
+  }
+  /*
+    9. Create a root stacking context
+  */
+  #root, #__next {
+    isolation: isolate;
+  }
+
+ul {
+    list-style: none;
+    padding: 0px;
+}
+  /*Typography*/
+  html {
+    --font-sans-serif:
+      -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+      helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+    --font-serif:
+      Iowan Old Style, Apple Garamond, Baskerville, Times New Roman,
+      Droid Serif, Times, Source Serif Pro, serif, Apple Color Emoji,
+      Segoe UI Emoji, Segoe UI Symbol;
+    /* Set a global default */
+    font-family: var(--font-sans-serif);
+  }
+/* 
+@media (orientation: landscape) {
+    ::-webkit-scrollbar {
+        width: 12px;
+        background-color: var(--color-gray-100);
+        background-color: hsl(0deg, 10%, 50%);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background-color: var(--color-gray-700);
+        background-color: hsl(0deg, 50%, 50%);
+    }
+
+    ::-webkit-scrollbar-track {
+        border-radius: 3px;
+        background-color: transparent;
+    }
+    
+} */
+
+/* containers */
+main, article, aside, div, ul, header, footer {
+    display: grid;
+    gap: 1rem;
+}
+
+section, nav {
+    display: flex;
+    gap: 1rem;
+}
+
+header > nav > ul {
+    display: flex;
+    gap: 1rem;
+}
+
+#main > * {
+    padding: 0 calc((100% - 1080px)/2);
+}
+
+.screen-cam-icon {
+    width: 0px;
+    height: 0px;
+    border-right: 8px solid black;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    transform: translate(-2px, 2px);
+}
+
+/* #main > * {
+    outline: 2px solid red;
+} */
+
+
+hr {
+    border-color: red;
+    margin: 1.5rem;
+}
+
+/*colors*/
+
+/* background-color: hsl(340deg 100% 50% / 1);
+    background-color: hsl(340deg 100% 50% / 0.75);
+    background-color: hsl(340deg 100% 50% / 0.5); 
+    background-color: hsl(340deg 100% 50% / 0.25);*/
+
+/*
+body {
+    
+    background-color: hsl(0deg 100% 0%);
+    color: white;
+}
+main > header {
+    height: 50px;
+    background-color: white;
+    color: black;
+    border-bottom: 5px solid hsl(270deg 100% 50%);
+}
+
+button {
+    background-color: hsl(270deg 100% 50%);
+    border: 1px solid hsl(270deg 100% 50%);
+    color: white;
+    border-radius: 1rem;
+    width: 8rem;
+    height: 4rem;
+}
+*/
+/* 
+input[role="switch"] {
+    width: 0;
+    height: 0;
+    visibility: hidden;
+}
+
+label[role="switch"] {
+    display: block;
+    width: 6rem;
+    height: 3rem;
+    background-color: hsl(0deg 100% 90%);
+    border-radius: 3rem;
+    position: relative;
+    cursor: pointer;
+    transition: 0.5s;
+    box-shadow: 0 0 20px #477a8550;
+}
+
+label[role="switch"]::after {
+    content: "";
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: white;
+    position: absolute;
+    border-radius: 2rem;
+    top: 0.2rem;
+    left: 0.3rem;
+    transition: 0.5s;
+  }
+
+  input[role="switch"]:checked + label[role="switch"]::after{
+    left: calc(100% - 0.3rem);
+    transform: translateX(-100%);
+}
+
+input[role="switch"]:checked + label[role="switch"]{
+    background-color: hsl(270deg 100% 50%);
+} */
+
+/*
+input {
+    accent-color: hsl(270deg 100% 50%);
+}
+
+.screen-cam-icon {
+    width: 0px;
+    height: 0px;
+    border-right: 8px solid white;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    transform: translate(-2px, 2px);
+}
+*/
+
+    
+/*
+    .irecord::before{
+        opacity: 0.4;
+        filter: grayscale(100%);
+        filter: invert(100%) sepia(20%) saturate(100%) hue-rotate(90deg) brightness(99%) contrast(107%);
+        content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-circle"><circle cx="12" cy="12" r="10"></circle></svg>');
+    }
+    .istop::before {
+        content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-stop-circle"><circle cx="12" cy="12" r="10"></circle><rect x="9" y="9" width="6" height="6"></rect></svg>');
+    }
+    .iclose::before {
+        content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-circle"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>');
+    }
+    .idownload::before{
+        content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>');
+    }
+    .iscreen::before{
+        content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-monitor"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>');
+    } 
+    .ivideocam::before{
+        content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-video"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>');
+    }
+    .icamera::before{
+        content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>');
+    }
+    .ihourglass::before{
+        content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path fill="currentColor" d="M360 64c13.255 0 24-10.745 24-24V24c0-13.255-10.745-24-24-24H24C10.745 0 0 10.745 0 24v16c0 13.255 10.745 24 24 24 0 90.965 51.016 167.734 120.842 192C75.016 280.266 24 357.035 24 448c-13.255 0-24 10.745-24 24v16c0 13.255 10.745 24 24 24h336c13.255 0 24-10.745 24-24v-16c0-13.255-10.745-24-24-24 0-90.965-51.016-167.734-120.842-192C308.984 231.734 360 154.965 360 64z" class=""></path></svg>');
+    }
+    .imic::before{
+        content: url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mic"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>');
+    } 
+
+*/
