@@ -43,7 +43,8 @@ pub fn Recorder<'a>(
     console::log!("Hello3");
 
     // record.onstop
-    let stop = Closure::wrap(Box::new(move |_| {
+    let stop = Closure::wrap(Box::new(move |hello| {
+        console::log!(hello);
         console::log!("recording stopped");
     }) as Box<dyn FnMut(JsValue)>);
     rec.set_onstop(Some(stop.as_ref().unchecked_ref()));
@@ -90,6 +91,11 @@ pub fn Recorder<'a>(
                 //let isStopped = stop.is_ok();
                 //console::log!(isStopped);
                 console::log!("recording stoping....");
+                let tracks = stream.get_tracks();
+                for t in tracks.iter() {
+                    let mst = t.unchecked_into::<MediaStreamTrack>();
+                    mst.stop();
+                }
                 dispathEvent.set(true);
             }
         }

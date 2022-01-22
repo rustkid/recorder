@@ -7,7 +7,7 @@ use crate::recorder::Recorder;
 use gloo::{console, utils};
 use wasm_bindgen::*;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{HtmlMediaElement, MediaStream, MediaStreamConstraints};
+use web_sys::{HtmlMediaElement, MediaStream, MediaStreamConstraints, MediaStreamTrack};
 
 async fn cam_stream() -> Result<MediaStream, JsValue> {
     let md = utils::window().navigator().media_devices().unwrap();
@@ -53,21 +53,35 @@ pub fn VideoTag(cx: Scope) -> Element {
 
     let k = match fut.value() {
         None => rsx!(h1{"loading"}),
-        Some(ms) => rsx!(Recorder {
-            stream: ms.clone(),
-            dispathEvent: isRecordingOver,
+        Some(ms) => match *isRecordingOver {
+            true => {
+                let tracks = ms.get_tracks();
+                for t in tracks.iter() {
+                    console::log!(&t);
+                    let mst = t.unchecked_into::<MediaStreamTrack>();
+                    mst.stop();
+                }
+                rsx!("done")
+            }
+            false => {
+                rsx!(Recorder {
+                    stream: ms.clone(),
+                    dispathEvent: isRecordingOver,
+                })
+            }
+        },
+    };
+
+    let displayVideo = match *isRecordingOver {
+        true => rsx!(""),
+        false => rsx!(video {
+            id: "my-video",
+            autoplay: "true" /* autoplay is very important */
         }),
     };
 
-    if *isRecordingOver {
-        console::log!("Recording done!");
-    };
-
-    cx.render(rsx! {
+    cx.render(rsx! (
         k
-        rsx!(video {
-            id: "my-video",
-            autoplay: "true" /* autoplay is very important */
-        })
-    })
+        displayVideo
+    ))
 }
