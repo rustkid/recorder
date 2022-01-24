@@ -2,10 +2,10 @@
 use dioxus::prelude::*;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::*;
-use web_sys::{BlobEvent, MediaRecorder, MediaStream, MediaStreamTrack, RecordingState};
+use web_sys::{BlobEvent, MediaRecorder, MediaStream, MediaStreamTrack, RecordingState, Url};
 
-use gloo::console;
 use gloo::file::{futures::read_as_bytes, Blob};
+use gloo::{console, utils};
 
 #[allow(dead_code)]
 enum Action {
@@ -17,13 +17,10 @@ enum Action {
 }
 
 #[inline_props]
-pub fn Recorder<'a>(
-    cx: Scope<'a>,
-    stream: MediaStream,
-    dispathEvent: UseState<'a, bool>,
-) -> Element {
+pub fn Recorder<'a>(cx: Scope, stream: MediaStream, dispathEvent: UseState<'a, bool>) -> Element {
     console::log!("Hello1");
-    let mydata: &mut Vec<u8> = cx.use_hook(|_| vec![]);
+
+    let blobs = use_ref(&cx, || Vec::<Blob>::new());
 
     let isRecording = use_state(&cx, || false);
     let rec = use_state(&cx, || {
@@ -50,20 +47,19 @@ pub fn Recorder<'a>(
     rec.set_onstop(Some(stop.as_ref().unchecked_ref()));
     stop.forget();
 
-    console::log!("Hello4");
     // record.ondataavailable
-
-    let mut idata = mydata.clone();
-    let d = Closure::wrap(Box::new(move |blob: JsValue| {
-        console::log!("Data available");
-        console::log!(&blob);
-        let web_sys_blob = blob.unchecked_into::<BlobEvent>().data().unwrap();
-        let blob = Blob::from(web_sys_blob);
-        read_as_bytes(&blob);
-        idata.push(1);
-        console::log!(idata.len());
+    let d = Closure::wrap(Box::new({
+        let blobs = blobs.clone();
+        move |blobEvent: JsValue| {
+            console::log!("Data available");
+            console::log!(&blobEvent);
+            let web_sys_blob = blobEvent.unchecked_into::<BlobEvent>().data().unwrap();
+            let blob = Blob::from(web_sys_blob);
+            //read_as_bytes(&blob);
+            blobs.write().push(blob);
+            //console::log!(blobs.read().len());
+        }
     }) as Box<dyn FnMut(JsValue)>);
-
     rec.set_ondataavailable(Some(d.as_ref().unchecked_ref()));
     d.forget();
 
@@ -72,12 +68,13 @@ pub fn Recorder<'a>(
     match *action {
         Action::Idle => {}
         Action::Start => {
-            rec.start_with_time_slice(1000).unwrap();
-            console::log!("recording started");
             let state = rec.state();
-            console::log!(state);
-            //mydata.push(1);
-            //console::log!(mydata.len());
+            if state != RecordingState::Recording {
+                rec.start_with_time_slice(1000).unwrap();
+                console::log!("recording started");
+                let state = rec.state();
+                console::log!(state);
+            }
         }
         Action::Stop => {
             let state = rec.state();
@@ -97,6 +94,10 @@ pub fn Recorder<'a>(
                     mst.stop();
                 }
                 dispathEvent.set(true);
+                console::log!(blobs.read().len());
+
+                //playBack.src = window.URL.createObjectURL(new Blob(recordingData));
+                //let k = Url::create_object_url_with_blob(blobs).unwrap();
             }
         }
         Action::Pause => {}
@@ -114,34 +115,6 @@ pub fn Recorder<'a>(
         }
     };
     console::log!("Hello6");
-
-    /* let view = match *isRecordingOver {
-        false => rsx! {
-            article {
-                style: "place-content: center; place-items: center;",
-                section {
-                    button {
-                        onclick: clickHandler,
-                        section{ style: "justify-content:center;gap:0;",
-                            /* span{if *isRecording {icons.stop} else {icons.record}} */
-                            span{
-                                match *isRecording {
-                                    true => rsx! {"Stop"},
-                                    false => rsx! {"Record"},
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        true => rsx! {
-            div {
-                style:"border: 2px solid red;",
-                video{playsinline:"true", controls:"true", autoplay:"true"}
-            }
-        },
-    }; */
 
     cx.render(rsx! {
         article {
@@ -161,5 +134,6 @@ pub fn Recorder<'a>(
                 }
             }
         }
+        video{playsinline:"true", controls:"true", autoplay:"true"}
     })
 }
