@@ -3,6 +3,8 @@ mod home;
 mod icons;
 mod recorder;
 mod router;
+mod screen;
+mod utils;
 
 use dioxus::prelude::*;
 
