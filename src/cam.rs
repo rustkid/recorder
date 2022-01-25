@@ -57,7 +57,7 @@ pub fn VideoTag(cx: Scope) -> Element {
             if *isRecordingOver {
                 let tracks = ms.get_tracks();
                 for t in tracks.iter() {
-                    console::log!(&t);
+                    //console::log!(&t);
                     let mst = t.unchecked_into::<MediaStreamTrack>();
                     mst.stop();
                 }

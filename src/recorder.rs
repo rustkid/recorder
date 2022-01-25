@@ -45,8 +45,8 @@ pub fn Recorder<'a>(cx: Scope, stream: MediaStream, dispathEvent: UseState<'a, b
     console::log!("Hello3");
 
     // record.onstop
-    let stop = Closure::wrap(Box::new(move |hello| {
-        console::log!(hello);
+    let stop = Closure::wrap(Box::new(move |_| {
+        //console::log!(hello);
         console::log!("recording stopped");
     }) as Box<dyn FnMut(JsValue)>);
     rec.set_onstop(Some(stop.as_ref().unchecked_ref()));
@@ -95,10 +95,13 @@ pub fn Recorder<'a>(cx: Scope, stream: MediaStream, dispathEvent: UseState<'a, b
                     let mst = t.unchecked_into::<MediaStreamTrack>();
                     mst.stop();
                 }
+                console::log!(122);
                 dispathEvent.set(true); //inform parent component
+                console::log!(123);
                 isRecordingOver.set(true);
-
+                console::log!(124);
                 action.set(Action::Play);
+                console::log!(125);
             }
         }
         Action::Pause => {
@@ -110,6 +113,7 @@ pub fn Recorder<'a>(cx: Scope, stream: MediaStream, dispathEvent: UseState<'a, b
             console::log!(rec.state());
         }
         Action::Play => {
+            console::log!(126);
             let k = blobs.read();
             let blob = Blob::new_with_buffer_source_sequence(&k).unwrap();
             let audio_url = Url::create_object_url_with_blob(&blob).unwrap();
