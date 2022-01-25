@@ -59,7 +59,7 @@ pub fn Recorder<'a>(cx: Scope, stream: MediaStream, dispathEvent: UseState<'a, b
             console::log!("Data available");
             console::log!(&blobEvent);
             let web_sys_blob = blobEvent.unchecked_into::<BlobEvent>().data().unwrap();
-            blobs.write().push(&web_sys_blob);
+            blobs.write_silent().push(&web_sys_blob);
         }
     }) as Box<dyn FnMut(JsValue)>);
     rec.set_ondataavailable(Some(d.as_ref().unchecked_ref()));
