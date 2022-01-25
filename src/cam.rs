@@ -53,26 +53,20 @@ pub fn VideoTag(cx: Scope) -> Element {
 
     let k = match fut.value() {
         None => rsx!(h1{"loading"}),
-        Some(ms) => match *isRecordingOver {
-            true => {
+        Some(ms) => {
+            if *isRecordingOver {
                 let tracks = ms.get_tracks();
                 for t in tracks.iter() {
                     console::log!(&t);
                     let mst = t.unchecked_into::<MediaStreamTrack>();
                     mst.stop();
                 }
-                rsx!(Recorder {
-                    stream: ms.clone(),
-                    dispathEvent: isRecordingOver,
-                })
             }
-            false => {
-                rsx!(Recorder {
-                    stream: ms.clone(),
-                    dispathEvent: isRecordingOver,
-                })
-            }
-        },
+            rsx!(Recorder {
+                stream: ms.clone(),
+                dispathEvent: isRecordingOver,
+            })
+        }
     };
 
     let displayVideo = match *isRecordingOver {

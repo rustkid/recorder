@@ -7,8 +7,7 @@ use web_sys::{
     MediaStreamTrack, RecordingState, Url,
 };
 
-use gloo::file::futures::read_as_bytes;
-use gloo::{console, utils};
+use gloo::{console, timers::callback::Timeout, utils};
 
 use js_sys::Array;
 
@@ -19,6 +18,8 @@ enum Action {
     Pause,
     Resume,
     Idle,
+    Play,
+    Save,
 }
 
 #[inline_props]
@@ -27,13 +28,12 @@ pub fn Recorder<'a>(cx: Scope, stream: MediaStream, dispathEvent: UseState<'a, b
 
     let blobs = use_ref(&cx, || Array::new());
 
-    let isRecording = use_state(&cx, || false);
     let rec = use_state(&cx, || {
         MediaRecorder::new_with_media_stream(stream).unwrap()
     });
     let action = use_state(&cx, || Action::Idle);
+    let isRecordingOver = use_state(&cx, || false);
 
-    console::log!(*isRecording);
     console::log!("Hello2");
     // record.onstart
     let f = Closure::wrap(Box::new(move |_| {
@@ -95,68 +95,128 @@ pub fn Recorder<'a>(cx: Scope, stream: MediaStream, dispathEvent: UseState<'a, b
                     let mst = t.unchecked_into::<MediaStreamTrack>();
                     mst.stop();
                 }
-                dispathEvent.set(true);
-                //console::log!(blobs.read().len());
-                let k = blobs.read();
-                let blob = Blob::new_with_buffer_source_sequence(&k).unwrap();
-                let audio_url = Url::create_object_url_with_blob(&blob).unwrap();
+                dispathEvent.set(true); //inform parent component
+                isRecordingOver.set(true);
 
+                action.set(Action::Play);
+            }
+        }
+        Action::Pause => {
+            rec.pause().unwrap();
+            console::log!(rec.state());
+        }
+        Action::Resume => {
+            rec.resume().unwrap();
+            console::log!(rec.state());
+        }
+        Action::Play => {
+            let k = blobs.read();
+            let blob = Blob::new_with_buffer_source_sequence(&k).unwrap();
+            let audio_url = Url::create_object_url_with_blob(&blob).unwrap();
+
+            let timeout = Timeout::new(1_00, move || {
                 //playback
                 let k = utils::document()
                     .get_element_by_id("playback")
                     .unwrap()
                     .dyn_into::<HtmlVideoElement>()
                     .unwrap();
-
                 k.set_src(&audio_url);
-                k.set_muted(true);
-                k.play();
-
-                //download
-                let a = utils::document()
-                    .create_element("a")
-                    .unwrap()
-                    .dyn_into::<HtmlAnchorElement>()
-                    .unwrap();
-                a.set_download("kanna.webm");
-                a.set_href(&audio_url);
-                a.click();
-            }
+                //k.set_muted(true);
+                //k.play();
+            });
+            timeout.forget();
         }
-        Action::Pause => {}
-        Action::Resume => {}
+        Action::Save => {
+            let k = blobs.read();
+            let blob = Blob::new_with_buffer_source_sequence(&k).unwrap();
+            let audio_url = Url::create_object_url_with_blob(&blob).unwrap();
+            //download
+            let a = utils::document()
+                .create_element("a")
+                .unwrap()
+                .dyn_into::<HtmlAnchorElement>()
+                .unwrap();
+            a.set_download("kanna.webm");
+            a.set_href(&audio_url);
+            a.click();
+        }
     }
 
-    let clickHandler = move |_| match *isRecording {
-        false => {
+    let startHandler = move |_| match rec.state() {
+        RecordingState::Inactive => {
             action.set(Action::Start);
-            isRecording.set(true);
         }
-        true => {
+        _ => {
             action.set(Action::Stop);
-            isRecording.set(false);
         }
     };
+
+    let pauseHandler = move |_| match rec.state() {
+        RecordingState::Recording => {
+            action.set(Action::Pause);
+        }
+        _ => {
+            action.set(Action::Resume);
+        }
+    };
+
+    let saveHandler = move |_| {
+        action.set(Action::Save);
+    };
+
     console::log!("Hello6");
 
     cx.render(rsx! {
         article {
             style: "place-content: center; place-items: center;",
             section {
-                button {
-                    onclick: clickHandler,
-                    section{ style: "justify-content:center;gap:0;",
-                        /* span{if *isRecording {icons.stop} else {icons.record}} */
-                        span{
-                            match *isRecording {
-                                true => rsx! {"Stop"},
-                                false => rsx! {"Record"},
+                match *isRecordingOver {
+                    false => {
+                        rsx!(
+                            button {
+                                onclick: startHandler,
+                                section{ style: "justify-content:center;gap:0;",
+                                    /* span{if *isRecording {icons.stop} else {icons.record}} */
+                                    span{
+                                        match *action {
+                                            Action::Idle => rsx!("Start"),
+                                            _ => rsx!{"Stop"},
+                                        }
+                                    }
+                                }
                             }
-                        }
+                            if rec.state() != RecordingState::Inactive {
+                                rsx!(button {
+                                    onclick: pauseHandler,
+                                    section{ style: "justify-content:center;gap:0;",
+                                        /* span{if *isRecording {icons.stop} else {icons.record}} */
+                                        span{
+                                            match *action {
+                                                Action::Start | Action::Resume => rsx!("Pause"),
+                                                _ => rsx!("Resume"),
+                                            }
+                                        }
+                                    }
+                                })
+                            } else {rsx!("")}
+                        )
+                    }
+                    true => {
+                        rsx!(button {
+                            onclick: saveHandler,
+                            section{ style: "justify-content:center;gap:0;",
+                                span{rsx!("Save")}
+                            }
+                        })
                     }
                 }
             }
+            match *isRecordingOver {
+                true => rsx!(video{id:"playback", playsinline:"true", controls:"true", autoplay:"true"}),
+                false => rsx!("")
+            }
         }
-        video{id:"playback", playsinline:"true", controls:"true", autoplay:"true"}
+        
     })
 }
