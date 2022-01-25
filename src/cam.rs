@@ -55,13 +55,17 @@ pub fn VideoTag(cx: Scope) -> Element {
         None => rsx!(h1{"loading"}),
         Some(ms) => match *isRecordingOver {
             true => {
-                let tracks = ms.get_tracks();
+                /* let tracks = ms.get_tracks();
                 for t in tracks.iter() {
                     console::log!(&t);
                     let mst = t.unchecked_into::<MediaStreamTrack>();
                     mst.stop();
                 }
-                rsx!("done")
+                rsx!("done") */
+                rsx!(Recorder {
+                    stream: ms.clone(),
+                    dispathEvent: isRecordingOver,
+                })
             }
             false => {
                 rsx!(Recorder {

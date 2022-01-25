@@ -2,10 +2,15 @@
 use dioxus::prelude::*;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::*;
-use web_sys::{BlobEvent, MediaRecorder, MediaStream, MediaStreamTrack, RecordingState, Url};
+use web_sys::{
+    Blob, BlobEvent, HtmlAnchorElement, HtmlVideoElement, MediaRecorder, MediaStream,
+    MediaStreamTrack, RecordingState, Url,
+};
 
-use gloo::file::{futures::read_as_bytes, Blob};
+use gloo::file::futures::read_as_bytes;
 use gloo::{console, utils};
+
+use js_sys::Array;
 
 #[allow(dead_code)]
 enum Action {
@@ -20,7 +25,7 @@ enum Action {
 pub fn Recorder<'a>(cx: Scope, stream: MediaStream, dispathEvent: UseState<'a, bool>) -> Element {
     console::log!("Hello1");
 
-    let blobs = use_ref(&cx, || Vec::<Blob>::new());
+    let blobs = use_ref(&cx, || Array::new());
 
     let isRecording = use_state(&cx, || false);
     let rec = use_state(&cx, || {
@@ -54,10 +59,7 @@ pub fn Recorder<'a>(cx: Scope, stream: MediaStream, dispathEvent: UseState<'a, b
             console::log!("Data available");
             console::log!(&blobEvent);
             let web_sys_blob = blobEvent.unchecked_into::<BlobEvent>().data().unwrap();
-            let blob = Blob::from(web_sys_blob);
-            //read_as_bytes(&blob);
-            blobs.write().push(blob);
-            //console::log!(blobs.read().len());
+            blobs.write().push(&web_sys_blob);
         }
     }) as Box<dyn FnMut(JsValue)>);
     rec.set_ondataavailable(Some(d.as_ref().unchecked_ref()));
@@ -94,10 +96,31 @@ pub fn Recorder<'a>(cx: Scope, stream: MediaStream, dispathEvent: UseState<'a, b
                     mst.stop();
                 }
                 dispathEvent.set(true);
-                console::log!(blobs.read().len());
+                //console::log!(blobs.read().len());
+                let k = blobs.read();
+                let blob = Blob::new_with_buffer_source_sequence(&k).unwrap();
+                let audio_url = Url::create_object_url_with_blob(&blob).unwrap();
 
-                //playBack.src = window.URL.createObjectURL(new Blob(recordingData));
-                //let k = Url::create_object_url_with_blob(blobs).unwrap();
+                //playback
+                let k = utils::document()
+                    .get_element_by_id("playback")
+                    .unwrap()
+                    .dyn_into::<HtmlVideoElement>()
+                    .unwrap();
+
+                k.set_src(&audio_url);
+                k.set_muted(true);
+                k.play();
+
+                //download
+                let a = utils::document()
+                    .create_element("a")
+                    .unwrap()
+                    .dyn_into::<HtmlAnchorElement>()
+                    .unwrap();
+                a.set_download("kanna.webm");
+                a.set_href(&audio_url);
+                a.click();
             }
         }
         Action::Pause => {}
@@ -134,6 +157,6 @@ pub fn Recorder<'a>(cx: Scope, stream: MediaStream, dispathEvent: UseState<'a, b
                 }
             }
         }
-        video{playsinline:"true", controls:"true", autoplay:"true"}
+        video{id:"playback", playsinline:"true", controls:"true", autoplay:"true"}
     })
 }
