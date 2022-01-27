@@ -1,7 +1,6 @@
 #![allow(non_snake_case)]
 use dioxus::prelude::*;
-
-//use gloo::console::log;
+use gloo::console;
 
 use crate::icons::{Icon, Icons};
 
@@ -43,6 +42,7 @@ fn Header(cx: Scope) -> Element {
 }
 
 fn Article(cx: Scope) -> Element {
+    let is_with_audio = use_state(&cx, || true);
     let iconScreen = Icons(cx, Icon::Screen);
     let iconVideocam = Icons(cx, Icon::Videocam);
     let iconMic = Icons(cx, Icon::Mic);
@@ -60,7 +60,7 @@ fn Article(cx: Scope) -> Element {
                                 }
                             }
                         }
-                        a{ href:"/cam/",
+                        a { href:"/cam/",
                             button{
                                 div{ style:"gap:0; place-items:center;",
                                 span{&iconVideocam}
@@ -92,8 +92,11 @@ fn Article(cx: Scope) -> Element {
                             input{
                                 style:"cursor:pointer;",
                                 r#type: "checkbox",
-                                /* checked:{*is_with_audio}, */
-                                /* onclick:{toggle_audio}, */
+                                checked: "{is_with_audio}",
+                                onclick: move |_| {
+                                    console::log!(*is_with_audio);
+                                    is_with_audio.set(!is_with_audio);
+                                }
                             }
                             "Record with Audio"
                         }

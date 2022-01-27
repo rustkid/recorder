@@ -4,10 +4,12 @@ use dioxus::prelude::*;
 
 use crate::recorder::Recorder;
 
+//use crate::utils::cam_stream;
+
 use gloo::{console, utils};
 use wasm_bindgen::*;
 use wasm_bindgen_futures::JsFuture;
-use web_sys::{HtmlMediaElement, MediaStream, MediaStreamConstraints, MediaStreamTrack};
+use web_sys::{HtmlMediaElement, MediaStream, MediaStreamConstraints};
 
 async fn cam_stream() -> Result<MediaStream, JsValue> {
     let md = utils::window().navigator().media_devices().unwrap();
@@ -54,17 +56,11 @@ pub fn VideoTag(cx: Scope) -> Element {
     let k = match fut.value() {
         None => rsx!(h1{"loading"}),
         Some(ms) => {
-            if *isRecordingOver {
-                let tracks = ms.get_tracks();
-                for t in tracks.iter() {
-                    //console::log!(&t);
-                    let mst = t.unchecked_into::<MediaStreamTrack>();
-                    mst.stop();
-                }
-            }
             rsx!(Recorder {
-                stream: ms.clone(),
+                stream: ms,
+                stream_screen: ms,
                 dispathEvent: isRecordingOver,
+                source: "cam",
             })
         }
     };

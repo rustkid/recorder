@@ -4,8 +4,9 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::*;
 use web_sys::{
     Blob, BlobEvent, HtmlAnchorElement, HtmlVideoElement, MediaRecorder, MediaStream,
-    MediaStreamTrack, RecordingState, Url,
+    MediaStreamTrack, RecordingState, Url, Event,
 };
+use crate::utils::{AudioVideoMix};
 
 use gloo::{console, timers::callback::Timeout, utils};
 
@@ -23,14 +24,19 @@ enum Action {
 }
 
 #[inline_props]
-pub fn Recorder<'a>(cx: Scope, stream: MediaStream, dispathEvent: UseState<'a, bool>) -> Element {
+pub fn Recorder<'a>(cx: Scope<'a>, stream: &'a MediaStream, stream_screen:&'a MediaStream, dispathEvent: UseState<'a, bool>, source: &'a str) -> Element {
     console::log!("Hello1");
 
     let blobs = use_ref(&cx, || Array::new());
 
-    let rec = use_state(&cx, || {
-        MediaRecorder::new_with_media_stream(stream).unwrap()
-    });
+    let kanna = match &source[..] {
+        "screen" => MediaRecorder::new_with_media_stream(&AudioVideoMix(&stream, &stream_screen)).unwrap(),
+        _ =>MediaRecorder::new_with_media_stream(stream).unwrap(),
+    };
+    
+
+    let rec = use_state(&cx, || {kanna});
+    
     let action = use_state(&cx, || Action::Idle);
     let isRecordingOver = use_state(&cx, || false);
 
@@ -45,9 +51,20 @@ pub fn Recorder<'a>(cx: Scope, stream: MediaStream, dispathEvent: UseState<'a, b
     console::log!("Hello3");
 
     // record.onstop
-    let stop = Closure::wrap(Box::new(move |_| {
+    let stop = Closure::wrap(Box::new(move |_evt: JsValue| {
         //console::log!(hello);
-        console::log!("recording stopped");
+        
+        console::log!("recording stopped kanna1");
+        /* let target = evt.unchecked_into::<Event>().target().unwrap();
+        let ms = target.unchecked_into::<MediaRecorder>().stream();
+        //console::log!(ms);
+        let tracks = ms.get_tracks();
+        for t in tracks.iter() {
+            let mst = t.unchecked_into::<MediaStreamTrack>();
+            mst.stop();
+        }
+        console::log!("recording stopped kanna2"); */
+
     }) as Box<dyn FnMut(JsValue)>);
     rec.set_onstop(Some(stop.as_ref().unchecked_ref()));
     stop.forget();
@@ -95,6 +112,13 @@ pub fn Recorder<'a>(cx: Scope, stream: MediaStream, dispathEvent: UseState<'a, b
                     let mst = t.unchecked_into::<MediaStreamTrack>();
                     mst.stop();
                 }
+
+                let tracks = stream_screen.get_tracks();
+                for t in tracks.iter() {
+                    let mst = t.unchecked_into::<MediaStreamTrack>();
+                    mst.stop();
+                }
+
                 console::log!(122);
                 dispathEvent.set(true); //inform parent component
                 console::log!(123);

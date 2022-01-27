@@ -19,6 +19,6 @@ console_error_panic_hook = "0.1"
 version = "0.3"
 features = ["Navigator","MediaDevices", "DisplayMediaStreamConstraints", "MediaStreamConstraints", "MediaStream", "MediaStreamTrack",
 "HtmlMediaElement", "HtmlVideoElement", "MediaRecorder", "RecordingState", "BlobEvent", "Url", "HtmlAnchorElement", "AudioContext",
-"MediaStreamAudioDestinationNode", "MediaStreamAudioSourceNode", "AudioNode"]
+"MediaStreamAudioDestinationNode", "MediaStreamAudioSourceNode", "AudioNode", "Event"]
 
 
