@@ -45,3 +45,15 @@ pub async fn display_stream(av: AV) -> Result<MediaStream, JsValue> {
     console::log!("permission granted");
     JsFuture::from(gum).await.map(MediaStream::from)
 }
+
+#[allow(dead_code)]
+#[derive(Debug, Clone, Copy)]
+pub enum Action {
+    Start,
+    Stop,
+    Pause,
+    Resume,
+    Idle,
+    Play,
+    Save,
+}

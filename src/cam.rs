@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
 
+use crate::utils::Action;
 use dioxus::prelude::*;
 
 use crate::recorder::Recorder;
@@ -24,8 +25,9 @@ async fn cam_stream() -> Result<MediaStream, JsValue> {
 pub fn VideoTag(cx: Scope) -> Element {
     let vtag = use_ref(&cx, || None);
     let isRecordingOver = use_state(&cx, || false);
+    let action = use_ref(&cx, || Action::Idle);
 
-    console::log!(*isRecordingOver);
+    //console::log!(*isRecordingOver);
     // when the element is mounted, bind the video element to the scope
     let fut = use_future(&cx, move || {
         let vtag = vtag.clone();
@@ -59,8 +61,9 @@ pub fn VideoTag(cx: Scope) -> Element {
             rsx!(Recorder {
                 stream: ms,
                 stream_screen: ms,
-                dispathEvent: isRecordingOver,
                 source: "cam",
+                action: action,
+                callBack: isRecordingOver,
             })
         }
     };
