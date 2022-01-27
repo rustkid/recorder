@@ -32,9 +32,6 @@ fn Header(cx: Scope) -> Element {
                         },
                         ul{
                             li{"Record"}
-                            li{"Remote"}
-                            li{"WhiteBoard"}
-                            li{"AirDrop"}
                         }
                     }
                 }
@@ -68,25 +65,8 @@ fn Article(cx: Scope) -> Element {
                                 }
                             }
                         }
-                        a{ href:"/screencam/",
-                            button{
-                                section{ style:"gap:0px; justify-content:center;",
-                                    span{&iconScreen}
-                                    span{ class:"screen-cam-icon"}
-                                }
-                                "Screen + Cam"
-                            }
-                        }
-                        a{ href:"/audio/",
-                            button{
-                                div{ style:"gap:0; place-items:center;",
-                                span{&iconMic}
-                                    span{"Mic Only"}
-                                }
-                            }
-                        }
                     },
-                    footer{
+                    /* footer{
                         label{
                             style:"cursor:pointer;",
                             input{
@@ -101,7 +81,7 @@ fn Article(cx: Scope) -> Element {
                             "Record with Audio"
                         }
                         p{"Resolution: waiting" }
-                    }
+                    } */
                 }
     })
 }

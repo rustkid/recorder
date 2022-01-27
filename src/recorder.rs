@@ -33,10 +33,10 @@ pub fn Recorder<'a>(cx: Scope<'a>, stream: &'a MediaStream, stream_screen:&'a Me
         let track = stream_screen.get_video_tracks().iter().next().unwrap();
         let mst = track.unchecked_into::<MediaStreamTrack>();
         let cb = Closure::wrap(Box::new({
-            
+
             move |_| {
             console::log!("hello fire");
-            
+            //action.set(Action::Stop); // Not able to call this.
             
         }}) as Box<dyn FnMut(JsValue)>);
         mst.set_onended(Some(cb.as_ref().unchecked_ref()));
