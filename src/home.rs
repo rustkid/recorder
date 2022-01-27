@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 use dioxus::prelude::*;
-use gloo::console;
+use dioxus::router::Link;
 
 use crate::icons::{Icon, Icons};
 
@@ -39,17 +39,15 @@ fn Header(cx: Scope) -> Element {
 }
 
 fn Article(cx: Scope) -> Element {
-    let is_with_audio = use_state(&cx, || true);
     let iconScreen = Icons(cx, Icon::Screen);
     let iconVideocam = Icons(cx, Icon::Videocam);
-    let iconMic = Icons(cx, Icon::Mic);
     cx.render(rsx! {
         article {style:"align-content:start; place-content: center;",
                     header{
                         h2{"Record"}
                     }
                     section{
-                        a {href:"/screen/",
+                        Link {to:"/screen/",
                             button{
                                 div{ style:"gap:0; place-items:center;",
                                     span{&iconScreen}
@@ -57,7 +55,7 @@ fn Article(cx: Scope) -> Element {
                                 }
                             }
                         }
-                        a { href:"/cam/",
+                        Link { to:"/cam/",
                             button{
                                 div{ style:"gap:0; place-items:center;",
                                 span{&iconVideocam}
@@ -66,22 +64,6 @@ fn Article(cx: Scope) -> Element {
                             }
                         }
                     },
-                    /* footer{
-                        label{
-                            style:"cursor:pointer;",
-                            input{
-                                style:"cursor:pointer;",
-                                r#type: "checkbox",
-                                checked: "{is_with_audio}",
-                                onclick: move |_| {
-                                    console::log!(*is_with_audio);
-                                    is_with_audio.set(!is_with_audio);
-                                }
-                            }
-                            "Record with Audio"
-                        }
-                        p{"Resolution: waiting" }
-                    } */
                 }
     })
 }
