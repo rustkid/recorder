@@ -18,7 +18,7 @@ async fn cam_stream() -> Result<MediaStream, JsValue> {
     constraints.video(&JsValue::from(true));
     constraints.audio(&JsValue::from(true));
     let gum = md.get_user_media_with_constraints(&constraints).unwrap();
-    console::log!("permission granted");
+    console::log!("Waiting for permission");
     JsFuture::from(gum).await.map(MediaStream::from)
 }
 
@@ -45,19 +45,17 @@ pub fn VideoTag(cx: Scope) -> Element {
                     k.set_muted(true);
 
                     vtag.write().replace(k);
-                    ms
+                    Ok(ms)
                 }
-                Err(_) => {
-                    panic!("cam stream failed")
-                }
+                Err(e) => Err(e),
             };
             kms
         }
     });
 
     let k = match fut.value() {
-        None => rsx!(h1{"loading"}),
-        Some(ms) => {
+        None => rsx!(h1{"Waiting for permission"}),
+        Some(Ok(ms)) => {
             rsx!(Recorder {
                 stream: ms,
                 stream_screen: ms,
@@ -65,6 +63,9 @@ pub fn VideoTag(cx: Scope) -> Element {
                 action: action,
                 callBack: isRecordingOver,
             })
+        }
+        Some(Err(_)) => {
+            rsx!(p { "Access denied error" })
         }
     };
 

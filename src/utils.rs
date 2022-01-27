@@ -32,7 +32,7 @@ pub async fn cam_stream(av: AV) -> Result<MediaStream, JsValue> {
     constraints.video(&JsValue::from(av.video));
     constraints.audio(&JsValue::from(av.audio));
     let gum = md.get_user_media_with_constraints(&constraints).unwrap();
-    console::log!("permission granted");
+    console::log!("Waiting for permission");
     JsFuture::from(gum).await.map(MediaStream::from)
 }
 
@@ -42,7 +42,7 @@ pub async fn display_stream(av: AV) -> Result<MediaStream, JsValue> {
     constraints.video(&JsValue::from(av.video));
     constraints.audio(&JsValue::from(av.audio));
     let gum = md.get_display_media_with_constraints(&constraints).unwrap();
-    console::log!("permission granted");
+    console::log!("Waiting for permission");
     JsFuture::from(gum).await.map(MediaStream::from)
 }
 
