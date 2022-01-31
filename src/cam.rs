@@ -24,7 +24,7 @@ async fn cam_stream() -> Result<MediaStream, JsValue> {
 
 pub fn VideoTag(cx: Scope) -> Element {
     let vtag = use_ref(&cx, || None);
-    let isRecordingOver = use_state(&cx, || false);
+    let isRecordingOver = use_ref(&cx, || false);
     let action = use_ref(&cx, || Action::Idle);
 
     //console::log!(*isRecordingOver);
@@ -61,7 +61,7 @@ pub fn VideoTag(cx: Scope) -> Element {
                 stream_screen: ms,
                 source: "cam",
                 action: action,
-                callBack: isRecordingOver,
+                isRecordingOver: isRecordingOver,
             })
         }
         Some(Err(_)) => {
@@ -69,7 +69,7 @@ pub fn VideoTag(cx: Scope) -> Element {
         }
     };
 
-    let displayVideo = match *isRecordingOver {
+    let displayVideo = match *isRecordingOver.read() {
         true => rsx!(""),
         false => rsx!(video {
             id: "my-video",

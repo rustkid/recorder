@@ -10,7 +10,9 @@ pub fn AudioVideoMix(audio_stream: &MediaStream, video_stream: &MediaStream) -> 
     let ctx = AudioContext::new().unwrap();
     let dest = ctx.create_media_stream_destination().unwrap();
 
-    if audio_stream.get_audio_tracks().iter().len() > 0 {
+    if audio_stream.get_audio_tracks().iter().len() > 0
+        && video_stream.get_video_tracks().iter().len() > 0
+    {
         let source = ctx.create_media_stream_source(&audio_stream).unwrap();
         source.connect_with_audio_node(&dest).unwrap();
     }
