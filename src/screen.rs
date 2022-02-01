@@ -8,7 +8,7 @@ use crate::utils::{cam_stream, display_stream, AV};
 
 pub fn Screen(cx: Scope) -> Element {
     let isRecordingOver = use_ref(&cx, || false);
-    let action = use_ref(&cx, || Action::Start);
+    let (_, set_action) = use_state(&cx, || Action::Start);
 
     let fut = use_future(&cx, move || async move {
         let audio_stream = cam_stream(AV {
@@ -34,7 +34,7 @@ pub fn Screen(cx: Scope) -> Element {
                 stream: &ms.0,
                 stream_screen: &ms.1,
                 source: "screen",
-                action: action,
+                set_action: set_action,
                 isRecordingOver: isRecordingOver,
             })
         }

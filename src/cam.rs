@@ -25,7 +25,7 @@ async fn cam_stream() -> Result<MediaStream, JsValue> {
 pub fn VideoTag(cx: Scope) -> Element {
     let vtag = use_ref(&cx, || None);
     let isRecordingOver = use_ref(&cx, || false);
-    let action = use_ref(&cx, || Action::Idle);
+    let (_, set_action) = use_state(&cx, || Action::Idle);
 
     //console::log!(*isRecordingOver);
     // when the element is mounted, bind the video element to the scope
@@ -60,7 +60,7 @@ pub fn VideoTag(cx: Scope) -> Element {
                 stream: ms,
                 stream_screen: ms,
                 source: "cam",
-                action: action,
+                set_action: set_action,
                 isRecordingOver: isRecordingOver,
             })
         }
