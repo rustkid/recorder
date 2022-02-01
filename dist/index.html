@@ -1,15 +1,41 @@
-<html lang="en"><head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/global-9d9b33a72ef2fe62.css">
-    <title>PixelPeg</title>
+<html>
+  <head>
+    <title>dioxus | ⛺</title>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <meta charset="UTF-8" />
+    
+    
+  </head>
+  <body>
+    <div id="main"></div>
+    <!-- Note the usage of `type=module` here as this is an ES6 module -->
+    <script type="module">
+      import init from "./assets/dioxus/dioxus.js";
+      init("./assets/dioxus/dioxus_bg.wasm");
+    </script>
+    
+  </body>
+</html>
+<script>(function () {
+  var protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  var url = protocol + '//' + window.location.host + '/_dioxus/ws';
+  var poll_interval = 8080;
+  var reload_upon_connect = () => {
+      window.setTimeout(
+          () => {
+              var ws = new WebSocket(url);
+              ws.onopen = () => window.location.reload();
+              ws.onclose = reload_upon_connect;
+          },
+          poll_interval);
+  };
 
-<link rel="preload" href="/index-54c6f5d8a53742e9_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
-<link rel="modulepreload" href="/index-54c6f5d8a53742e9.js"></head>
-
-<body>
-    <div id="main" style="gap:0; height:100%;"> </div>
-
-
-<script type="module">import init from '/index-54c6f5d8a53742e9.js';init('/index-54c6f5d8a53742e9_bg.wasm');</script></body></html>
+  var ws = new WebSocket(url);
+  ws.onmessage = (ev) => {
+      if (ev.data == "reload") {
+        //   alert("reload!!!");
+          window.location.reload();
+      }
+  };
+  ws.onclose = reload_upon_connect;
+})()</script>

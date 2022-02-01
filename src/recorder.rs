@@ -1,49 +1,65 @@
 #![allow(non_snake_case)]
+use crate::utils::{Action, AudioVideoMix};
 use dioxus::prelude::*;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::*;
 use web_sys::{
-    Blob, BlobEvent, HtmlAnchorElement, HtmlVideoElement, MediaRecorder, MediaStream,
-    MediaStreamTrack, RecordingState, Url, //HtmlElement
+    Blob,
+    BlobEvent,
+    HtmlAnchorElement,
+    HtmlVideoElement,
+    MediaRecorder,
+    MediaStream,
+    MediaStreamTrack,
+    RecordingState,
+    Url, //HtmlElement
 };
-use crate::utils::{AudioVideoMix, Action};
 
 use gloo::{console, timers::callback::Timeout, utils};
 
 use js_sys::Array;
 
 #[inline_props]
-pub fn Recorder<'a>(cx: Scope<'a>, stream: &'a MediaStream, stream_screen:&'a MediaStream, source: &'a str, action: &'a UseRef<Action>, isRecordingOver: &'a UseRef<bool>) -> Element {
+pub fn Recorder<'a>(
+    cx: Scope<'a>,
+    stream: &'a MediaStream,
+    stream_screen: &'a MediaStream,
+    source: &'a str,
+    set_action: &'a UseState<Action>,
+    isRecordingOver: &'a UseRef<bool>,
+) -> Element {
     console::log!("Hello1");
-    let (action, set_action) = use_state(&cx, || *action.read());
 
     let blobs = use_ref(&cx, || Array::new());
 
     let mixedStreamRecorder = match &source[..] {
-        "screen" => MediaRecorder::new_with_media_stream(&AudioVideoMix(&stream, &stream_screen)).unwrap(),
-        _ =>MediaRecorder::new_with_media_stream(stream).unwrap(),
+        "screen" => {
+            MediaRecorder::new_with_media_stream(&AudioVideoMix(&stream, &stream_screen)).unwrap()
+        }
+        _ => MediaRecorder::new_with_media_stream(stream).unwrap(),
     };
 
-    let (rec, _) = use_state(&cx, || {mixedStreamRecorder});
+    let (rec, _) = use_state(&cx, || mixedStreamRecorder);
 
-    {// browser native "stop sharing" button
+    {
+        // browser native "stop sharing" button
         let track = stream_screen.get_video_tracks().iter().next().unwrap();
         let mst = track.unchecked_into::<MediaStreamTrack>();
         let cb = Closure::wrap(Box::new({
             move |_| {
-            console::log!("hello fire");
-            
-            //set_action(Action::Stop); // Not able to call this.
+                console::log!("hello fire");
 
-            /* let k = utils::document()
-                    .get_element_by_id("stopButton")
-                    .unwrap()
-                    .dyn_into::<HtmlElement>()
-                    .unwrap();
-            k.click();
-            console::log!("stopButton"); */
+                //set_action(Action::Stop); // Not able to call this.
 
-        }}) as Box<dyn FnMut(JsValue)>);
+                /* let k = utils::document()
+                        .get_element_by_id("stopButton")
+                        .unwrap()
+                        .dyn_into::<HtmlElement>()
+                        .unwrap();
+                k.click();
+                console::log!("stopButton"); */
+            }
+        }) as Box<dyn FnMut(JsValue)>);
         mst.set_onended(Some(cb.as_ref().unchecked_ref()));
         cb.forget();
     }
@@ -61,7 +77,6 @@ pub fn Recorder<'a>(cx: Scope<'a>, stream: &'a MediaStream, stream_screen:&'a Me
     // record.onstop
     let stop = Closure::wrap(Box::new(move |_evt: JsValue| {
         console::log!("recording stopped kanna1");
-
     }) as Box<dyn FnMut(JsValue)>);
     rec.set_onstop(Some(stop.as_ref().unchecked_ref()));
     stop.forget();
@@ -81,7 +96,7 @@ pub fn Recorder<'a>(cx: Scope<'a>, stream: &'a MediaStream, stream_screen:&'a Me
 
     console::log!("Hello5");
 
-    match action {
+    match set_action.get().as_ref() {
         Action::Idle => {}
         Action::Start => {
             let state = rec.state();
@@ -97,7 +112,7 @@ pub fn Recorder<'a>(cx: Scope<'a>, stream: &'a MediaStream, stream_screen:&'a Me
             console::log!(state);
             if state != RecordingState::Inactive {
                 rec.stop().unwrap();
-            }    
+            }
             console::log!("recording stoping....");
             let tracks = stream.get_tracks();
             for t in tracks.iter() {
@@ -112,7 +127,6 @@ pub fn Recorder<'a>(cx: Scope<'a>, stream: &'a MediaStream, stream_screen:&'a Me
             }
             isRecordingOver.set(true);
             set_action(Action::Play);
-            
         }
         Action::Pause => {
             rec.pause().unwrap();
@@ -166,23 +180,16 @@ pub fn Recorder<'a>(cx: Scope<'a>, stream: &'a MediaStream, stream_screen:&'a Me
             _ => {
                 console::log!("Hai start2");
                 set_action(Action::Stop);
-
             }
         }
     };
 
     let pauseHandler = move |_| match rec.state() {
-        RecordingState::Recording => {
-            set_action(Action::Pause);
-        }
-        _ => {
-            set_action(Action::Resume);
-        }
+        RecordingState::Recording => set_action(Action::Pause),
+        _ => set_action(Action::Resume),
     };
 
-    let saveHandler = move |_| {
-        set_action(Action::Save);
-    };
+    let saveHandler = move |_| set_action(Action::Save);
 
     console::log!("Hello6");
 
@@ -199,7 +206,7 @@ pub fn Recorder<'a>(cx: Scope<'a>, stream: &'a MediaStream, stream_screen:&'a Me
                                 section{ style: "justify-content:center;gap:0;",
                                     /* span{if *isRecording {icons.stop} else {icons.record}} */
                                     span{
-                                        match action {
+                                        match set_action.get().as_ref() {
                                             Action::Idle => rsx!("Start"),
                                             _ => rsx!{"Stop"},
                                         }
@@ -212,7 +219,7 @@ pub fn Recorder<'a>(cx: Scope<'a>, stream: &'a MediaStream, stream_screen:&'a Me
                                     section{ style: "justify-content:center;gap:0;",
                                         /* span{if *isRecording {icons.stop} else {icons.record}} */
                                         span{
-                                            match action {
+                                            match set_action.get().as_ref() {
                                                 Action::Start | Action::Resume => rsx!("Pause"),
                                                 _ => rsx!("Resume"),
                                             }
@@ -237,6 +244,5 @@ pub fn Recorder<'a>(cx: Scope<'a>, stream: &'a MediaStream, stream_screen:&'a Me
                 false => rsx!("")
             }
         }
-        
     })
 }
