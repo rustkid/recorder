@@ -80,7 +80,7 @@ pub fn Recorder<'a>(
         let blobs = blobs.clone();
         move |blobEvent: JsValue| {
             console::log!("Data available");
-            console::log!(&blobEvent);
+            //console::log!(&blobEvent);
             let web_sys_blob = blobEvent.unchecked_into::<BlobEvent>().data().unwrap();
             blobs.write_silent().push(&web_sys_blob);
         }

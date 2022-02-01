@@ -349,7 +349,7 @@ async function load(module, imports) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = new URL('index-1eb9a63c8447dd16_bg.wasm', import.meta.url);
+        input = new URL('index-65d32d11b1386795_bg.wasm', import.meta.url);
     }
     const imports = {};
     imports.wbg = {};
@@ -368,10 +368,6 @@ async function init(input) {
         }
         var ret = false;
         return ret;
-    };
-    imports.wbg.__wbindgen_object_clone_ref = function(arg0) {
-        var ret = getObject(arg0);
-        return addHeapObject(ret);
     };
     imports.wbg.__wbg_new_48900979f8f40f34 = function(arg0) {
         var ret = new Interpreter(takeObject(arg0));
@@ -477,6 +473,10 @@ async function init(input) {
         const n0 = uint64CvtShim[0];
         var v1 = getCachedStringFromWasm0(arg3, arg4);
         getObject(arg0).RemoveAttribute(n0, v1);
+    };
+    imports.wbg.__wbindgen_object_clone_ref = function(arg0) {
+        var ret = getObject(arg0);
+        return addHeapObject(ret);
     };
     imports.wbg.__wbindgen_is_function = function(arg0) {
         var ret = typeof(getObject(arg0)) === 'function';
